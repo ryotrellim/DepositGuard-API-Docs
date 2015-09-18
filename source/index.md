@@ -2,7 +2,8 @@
 title: API Reference
 
 language_tabs:
-  - shell
+  - HTTP
+  - More languages coming soon...
 
 toc_footers:
   - <a href='#'>Sign Up for a Developer Key</a>
@@ -21,49 +22,58 @@ The DepositGuard API offers simple and secure ways to create, fund, and manage e
 
 # Authentication
 
-Authorize your application to make requests using an OAuth2 client credentials pattern.
 
-> To authorize, use this code:
 
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+```http
+POST /oauth/token HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic <Base64 encoded string of “clientId:secret”>
+Host: api.depositguard.com
+
+grant_type=client_credentials
+```
+``` http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "access_token": "<Access-Token>",
+  "token_type": "Bearer",
+  "expires_in": 28800
+}
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+Authorize your application to make requests using an OAuth2 client credentials pattern.
 
 Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+All subsequent requests should now include the header:
 
-`Authorization: meowmeowmeow`
+`Authorization: Bearer <Access-Token>`
 
 <aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
+It is not possible to refresh the access token.  When the token expires, fetch another one.
 </aside>
 
-# Kittens
+# Agreements
 
-## Get All Kittens
+## Create Agreement
 
-```ruby
-require 'kittn'
+```http
+POST /oauth/token HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic <Base64 encoded string of “clientId:secret”>
+Host: api.depositguard.com
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
+grant_type=client_credentials
 ```
+``` http
+HTTP/1.1 200 OK
+Content-Type: application/json
 
-```python
-import kittn
+{
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
+}
 ```
 
 > The above command returns JSON structured like this:
