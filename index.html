@@ -4,16 +4,16 @@
     <meta charset="utf-8">
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>API Reference</title>
+    <title>DepositGuard API</title>
 
     <link href="stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
     <link href="stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
       <script src="javascripts/all.js" type="text/javascript"></script>
 
       <script>
         $(function() {
-          setupLanguages(["shell","ruby","python"]);
+          setupLanguages(["HTTP"]);
         });
       </script>
   </head>
@@ -21,16 +21,13 @@
   <body class="index">
     <a href="#" id="nav-button">
       <span>
-        NAV
         <img src="images/navbar.png" />
       </span>
     </a>
     <div class="tocify-wrapper">
       <img src="images/logo.png" />
         <div class="lang-selector">
-              <a href="#" data-language-name="shell">shell</a>
-              <a href="#" data-language-name="ruby">ruby</a>
-              <a href="#" data-language-name="python">python</a>
+              <a href="#" data-language-name="HTTP">HTTP</a>
         </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
@@ -38,218 +35,1025 @@
         <ul class="search-results"></ul>
       <div id="toc">
       </div>
-        <ul class="toc-footer">
-            <li><a href='#'>Sign Up for a Developer Key</a></li>
-            <li><a href='http://github.com/tripit/slate'>Documentation Powered by Slate</a></li>
-        </ul>
     </div>
     <div class="page-wrapper">
       <div class="dark-box"></div>
       <div class="content">
-        <h1 id='introduction'>Introduction</h1>
-<p>Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.</p>
+        <h1 id="depositguard-api">DepositGuard API</h1>
 
-<p>We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
-
-<p>This example API documentation page was created with <a href="http://github.com/tripit/slate">Slate</a>. Feel free to edit it and use it as a base for your own API&rsquo;s documentation.</p>
-<h1 id='authentication'>Authentication</h1>
-<blockquote>
-<p>To authorize, use this code:</p>
-</blockquote>
-<pre><code class="highlight ruby"><span class="nb">require</span> <span class="s1">'kittn'</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-</code></pre>
-<pre><code class="highlight python"><span class="kn">import</span> <span class="nn">kittn</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-</code></pre>
-<pre><code class="highlight shell"><span class="c"># With shell, you can just pass the correct header with each request</span>
-curl <span class="s2">"api_endpoint_here"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre>
+<p>The DepositGuard API offers simple and secure ways to create, fund, and manage escrow accounts for vacation and rental properties.</p>
 
 <blockquote>
-<p>Make sure to replace <code class="prettyprint">meowmeowmeow</code> with your API key.</p>
+<p>Example HTTP requests and responses are available below.</p>
 </blockquote>
 
-<p>Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our <a href="http://example.com/developers">developer portal</a>.</p>
+<h3 id="typical-flow">Typical Flow</h3>
 
-<p>Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:</p>
+<ol>
+<li> Create an agreement.</li>
+<li> Collect payment methods.</li>
+<li> Deposit funds into escrow.</li>
+<li> Collect payout methods.</li>
+<li> Disburse security deposits and fees.</li>
+</ol>
 
-<p><code class="prettyprint">Authorization: meowmeowmeow</code></p>
+<h1 id="technical-overview">Technical Overview</h1>
 
-<p><aside class="notice">
-You must replace <code class="prettyprint">meowmeowmeow</code> with your personal API key.
-</aside></p>
-<h1 id='kittens'>Kittens</h1><h2 id='get-all-kittens'>Get All Kittens</h2><pre><code class="highlight ruby"><span class="nb">require</span> <span class="s1">'kittn'</span>
+<h3 id="important-headers">Important Headers</h3>
 
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="p">.</span><span class="nf">kittens</span><span class="p">.</span><span class="nf">get</span>
-</code></pre>
-<pre><code class="highlight python"><span class="kn">import</span> <span class="nn">kittn</span>
+<ul>
+<li>The only supported <code class="prettyprint">content-type</code> is &ldquo;application/json&rdquo; and is required in every request.</li>
+<li>An <code class="prettyprint">authorization</code> header is required in every request.</li>
+<li>A <code class="prettyprint">location</code> header is returned any time a resource is created.  The resource identifier can be attained by parsing the url returned.</li>
+</ul>
 
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="o">.</span><span class="n">kittens</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-</code></pre>
-<pre><code class="highlight shell">curl <span class="s2">"http://example.com/api/kittens"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre>
+<h3 id="need-access-or-help">Need Access or Help?</h3>
+
+<p>Request credentials to the DepositGuard API or ask for assistance by emailing <a href="mailto:api@depositguard.com">api@depositguard.com</a>.</p>
+
+<h1 id="authentication">Authentication</h1>
 
 <blockquote>
-<p>The above command returns JSON structured like this:</p>
+<p>Unlike all subsequent requests, the authentication endpoint requires the &ldquo;application/x-www-form-urlencoded&rsquo; content-type.</p>
 </blockquote>
-<pre><code class="highlight json"><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Fluffums"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"calico"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Isis"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unknown"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/oauth/token</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/x-www-form-urlencoded</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Basic &lt;Base64 encoded string of “clientId:secret”&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
-<p>This endpoint retrieves all kittens.</p>
-<h3 id='http-request'>HTTP Request</h3>
-<p><code class="prettyprint">GET http://example.com/kittens</code></p>
-<h3 id='query-parameters'>Query Parameters</h3>
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>include_cats</td>
-<td>false</td>
-<td>If set to true, the result will also include cats.</td>
-</tr>
-<tr>
-<td>available</td>
-<td>true</td>
-<td>If set to false, the result will include kittens that have already been adopted.</td>
-</tr>
-</tbody></table>
-
-<p><aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside></p>
-<h2 id='get-a-specific-kitten'>Get a Specific Kitten</h2><pre><code class="highlight ruby"><span class="nb">require</span> <span class="s1">'kittn'</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="p">.</span><span class="nf">kittens</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+grant_type=client_credentials
 </code></pre>
-<pre><code class="highlight python"><span class="kn">import</span> <span class="nn">kittn</span>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="o">.</span><span class="n">kittens</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre>
-<pre><code class="highlight shell">curl <span class="s2">"http://example.com/api/kittens/3"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre>
-
-<blockquote>
-<p>The above command returns JSON structured like this:</p>
-</blockquote>
-<pre><code class="highlight json"><span class="p">{</span><span class="w">
-  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Isis"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unknown"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"access_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;Access-Token&gt;"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"token_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Bearer"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"expires_in"</span><span class="p">:</span><span class="w"> </span><span class="mi">28800</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>This endpoint retrieves a specific kitten.</p>
+<p>Authenticate your application to make requests using an OAuth2 client credentials pattern.  Your application will then be <em>authorized</em> to manage any resources (agreements, payment methods, etc.) that it creates or owns.</p>
 
-<p><aside class="warning">If you&rsquo;re not using an administrator API key, note that some kittens will return 403 Forbidden if they are hidden for admins only.</aside></p>
-<h3 id='http-request'>HTTP Request</h3>
-<p><code class="prettyprint">GET http://example.com/kittens/&lt;ID&gt;</code></p>
-<h3 id='url-parameters'>URL Parameters</h3>
+<h3 id="response-reference">Response Reference</h3>
+
 <table><thead>
 <tr>
 <th>Parameter</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
-<td>ID</td>
-<td>The ID of the cat to retrieve</td>
+<td>access_token</td>
+<td>String</td>
+<td>Prepend this string with &quot;Bearer&rdquo; (the token type) and use it as the authorization header in all requests until it expires.</td>
+</tr>
+<tr>
+<td>token_type</td>
+<td>String</td>
+<td>Indicates that whoever has this token is given access.  &ldquo;Bearer&rdquo; is the only token type supported at this time.</td>
+</tr>
+<tr>
+<td>expires_in</td>
+<td>Integer</td>
+<td>Time in milleseconds until the access token expires and a new one must be attained.</td>
 </tr>
 </tbody></table>
 
-          <h1 id='errors'>Errors</h1>
-<p><aside class="notice">This error section is stored in a separate file in <code class="prettyprint">includes/_errors.md</code>. Slate allows you to optionally separate out your docs into many files&hellip;just save them to the <code class="prettyprint">includes</code> folder and add them to the top of your <code class="prettyprint">index.md</code>&rsquo;s frontmatter. Files are included in the order listed.</aside></p>
+<aside class="notice">
+It is not possible to refresh the access token.  You must attain another when the token expires.
+</aside>
 
-<p>The Kittn API uses the following error codes:</p>
+<h1 id="agreements">Agreements</h1>
+
+<h2 id="create-agreement">Create Agreement</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"terms"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"dates"</span><span class="p">:{</span><span class="w">
+       </span><span class="nt">"start_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YYYY-MM-dd 12:34:56Z"</span><span class="p">,</span><span class="w">
+       </span><span class="nt">"end_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YYYY-MM-dd 12:34:56Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"terms of the agreement go here"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"renter"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
+    </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"foo"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bar"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234567890"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"renter@gmail.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"address"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Austin"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TX"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78704"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123 4th Street"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Apt. 456"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}],</span><span class="w">
+  </span><span class="nt">"landlord"</span><span class="p">:[{</span><span class="w">
+    </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"foo"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bar"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234567890"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"landlord@gmail.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"address"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Austin"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TX"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78704"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123 4th Street"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Apt. 456"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">https://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db</span>
+
+</code></pre>
+
+<p>An agreement is required before transfering funds to the DepositGuard escrow and should be communicated and agreed to by all parties involved.</p>
+
+<p>All fields are required unless otherwise marked <code class="prettyprint">optional</code>.</p>
+
+<h3 id="request-reference">Request Reference</h3>
+
+<p></br>
+<strong>Root</strong></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>external_id</td>
+<td>String</td>
+<td><code class="prettyprint">Optional.</code>  Can be used to match DepositGuard agreements with the integrator&rsquo;s systems.</td>
+</tr>
+</tbody></table>
+
+<p></br>
+<strong>Terms</strong></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>start_date</td>
+<td>ISO 8601 string</td>
+<td>The start date for when the property will be occupied.</td>
+</tr>
+<tr>
+<td>end_date</td>
+<td>ISO 8601 string</td>
+<td>The end date for when the property will be vacated.</td>
+</tr>
+<tr>
+<td>text</td>
+<td>String</td>
+<td>Should be used to record the full terms of the rental agreement.</td>
+</tr>
+</tbody></table>
+
+<p></br>
+<strong>Renter &amp; Landlord</strong></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>first_name</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>last_name</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>phone</td>
+<td>String</td>
+<td>Should be stripped of dashes and periods.</td>
+</tr>
+<tr>
+<td>email</td>
+<td>String</td>
+<td>Must be a valid email address.</td>
+</tr>
+<tr>
+<td>city</td>
+<td>String</td>
+<td>Full city name.  US-only.</td>
+</tr>
+<tr>
+<td>state</td>
+<td>String</td>
+<td>Use the ANSI 2-letter state code.  US-only.</td>
+</tr>
+<tr>
+<td>postal_code</td>
+<td>String</td>
+<td>5-digit postal code.  US-only.</td>
+</tr>
+<tr>
+<td>address_line1</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>address_line2</td>
+<td>String</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h2 id="get-agreement">Get Agreement</h2>
+<pre class="highlight http"><code><span class="nf">GET</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+</code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"agreement_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"d646e985-b895-4fb6-b121-b221e5daa9db"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"terms"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"dates"</span><span class="p">:{</span><span class="w">
+       </span><span class="nt">"start_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YYYY-MM-dd 12:34:56Z"</span><span class="p">,</span><span class="w">
+       </span><span class="nt">"end_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YYYY-MM-dd 12:34:56Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"terms of the agreement go here"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"renter"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
+    </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"foo"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bar"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234567890"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"renter@gmail.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"address"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Austin"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TX"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78704"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123 4th Street"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Apt. 456"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}],</span><span class="w">
+  </span><span class="nt">"landlord"</span><span class="p">:[{</span><span class="w">
+    </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"foo"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bar"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234567890"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"landlord@gmail.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"address"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Austin"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TX"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78704"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123 4th Street"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Apt. 456"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Fetching the agreement shows the same information used to create it, with the exception of a couple properties.</p>
+
+<h3 id="response-reference">Response Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>agreement_id</td>
+<td>GUID</td>
+<td>Globally unique identifier of the agreement.  Not editable.</td>
+</tr>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The current status of the agreement.  Values include: </br></br><code class="prettyprint">active</code> - The default staus of a new agreement</br></br><code class="prettyprint">completed</code> - Used when a an agreement terms are satisfied and disbursement is complete</br></br><code class="prettyprint">cancelled</code> - Used when an agreement is no longer valid.</td>
+</tr>
+</tbody></table>
+
+<h2 id="modify-agreement">Modify Agreement</h2>
+<pre class="highlight http"><code><span class="nf">PUT</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+</code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
+</code></pre>
+
+<p>Modifying an agreement requires a <em>full PUT</em>, meaning the entire agreement must be re-submitted if any part changes.</p>
+
+<h3 id="response-reference">Response Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>agreement_id</td>
+<td>GUID</td>
+<td>Globally unique identifier of the agreement.  Not editable.</td>
+</tr>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The current status of the agreement.  Values include: </br></br><code class="prettyprint">active</code> - The default staus of a new agreement</br></br><code class="prettyprint">completed</code> - Used when a an agreement terms are satisfied and disbursement is complete</br></br><code class="prettyprint">cancelled</code> - Used when an agreement is no longer valid.</td>
+</tr>
+</tbody></table>
+
+<h2 id="cancel-agreement">Cancel Agreement</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"renter cancelled trip."</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/history</span>
+</code></pre>
+
+<p>Cancels the agreement and all payments and payouts.  The agreement cannot be re-activated or resumed.  This can only be performed prior to the first payment.</p>
+
+<h3 id="request-reference">Request Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>note</td>
+<td>String</td>
+<td><code class="prettyprint">Optional.</code> Leaves a note for a historical purposes.</td>
+</tr>
+</tbody></table>
+
+<h2 id="complete-agreement">Complete Agreement</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+
+<span class="p">{}</span><span class="w">
+</span></code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/complete</span>
+</code></pre>
+
+<p>Completes the agreement.  Use this when the agreement terms are fulfilled and all parties are satisfied.</p>
+
+<h3 id="request-reference">Request Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>note</td>
+<td>String</td>
+<td><code class="prettyprint">Optional.</code> Leaves a note for a historical purposes.</td>
+</tr>
+</tbody></table>
+
+<h2 id="agreement-notes">Agreement Notes</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"notes"</span><span class="p">:</span><span class="w"> </span><span class="s2">"renter requested and was sent images of property"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/notes</span>
+</code></pre>
+
+<p>Add an additional note to the agreement.</p>
+
+<h3 id="request-reference">Request Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>note</td>
+<td>String</td>
+<td>Leaves a note for a historical purposes.</td>
+</tr>
+</tbody></table>
+
+<h2 id="agreement-history">Agreement History</h2>
+<pre class="highlight http"><code><span class="nf">GET</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/history</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+</code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"agreement_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"events"</span><span class="p">:[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agreement_created"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"note"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"renter requested and was sent images of property"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agreement_modified"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-23T13:15:30Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"charge"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"charge"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="p">,</span><span class="w">
+    </span><span class="err">}</span><span class="p">,</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agreement_complete"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"disbursement"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"full disbursement"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Retrieve a complete history of actions related to the agreement including financial logs.</p>
+
+<h3 id="request-reference">Request Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>agreement_id</td>
+<td>GUID</td>
+<td></td>
+</tr>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Kind of event.  Values include: <code class="prettyprint">agreement_created</code>, <code class="prettyprint">agreement_modified</code>, <code class="prettyprint">agreement_complete</code>, <code class="prettyprint">agreement_cancelled</code>, <code class="prettyprint">deposit</code>, <code class="prettyprint">disburse</code>, and <code class="prettyprint">note</code></td>
+</tr>
+<tr>
+<td>note</td>
+<td>String</td>
+<td>Returned if any note was left.</td>
+</tr>
+</tbody></table>
+
+<h1 id="payments">Payments</h1>
+
+<h2 id="capture-payment-method">Capture Payment Method</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/paymentmethods</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234567890"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"John B. Doe"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"cvv"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"exp_month"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"exp_year"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2021"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Austin"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TX"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78704"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"address_line1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123 4th Street"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"address_line2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Apt. 456"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">https://api.depositguard.com/paymentmethods/6dcbd862-e01d-4639-a5b4-774bda55ed09</span>
+
+
+</code></pre>
+
+<p>The renter needs to provide payment information to fund the escrow account and eventually pay the landlord.  Use the external_customer_id property to connect the payment method to the user in your system.</p>
+
+<aside class="notice">
+Payments can only be made with a credit card.</br>
+</aside>
+
+<aside class="notice">
+Payment methods are not explicitly associated with a user or with an agreement.
+</aside>
+
+<h3 id="request-reference">Request Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>external_id</td>
+<td>String</td>
+<td><code class="prettyprint">Optional.</code>  Can be used to match DepositGuard payment methods with the integrator&rsquo;s systems.</td>
+</tr>
+<tr>
+<td>number</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>cvv</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>exp_month</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>exp_year</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>city</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>state</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>postal_code</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>address_line1</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>address-line2</td>
+<td>String</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h2 id="get-payment-method">Get Payment Method</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/paymentmethods/6dcbd862-e01d-4639-a5b4-774bda55ed09</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+</code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"payment_method_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6dcbd862-e01d-4639-a5b4-774bda55ed09"</span><span class="p">,</span><span class="w"> 
+  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234567890"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"John B. Doe"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"cvv"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"exp_month"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"exp_year"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2021"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Austin"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TX"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78704"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"address_line1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123 4th Street"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"address_line2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Apt. 456"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span></code></pre>
+
+<p>Get a payment method to view its status and details.</p>
+
+<h3 id="response-reference">Response Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>payment_method_id</td>
+<td>GUID</td>
+<td>Globally unique identifier of the payment method.  Not editable.</td>
+</tr>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The current status of the payment method.  Values include <code class="prettyprint">active</code> and <code class="prettyprint">expired</code>.</td>
+</tr>
+</tbody></table>
+
+<h2 id="payment">Payment</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"payment_method_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6dcbd862-e01d-4639-a5b4-774bda55ed09"</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">required</span><span class="w">
+  </span><span class="nt">"amount"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123.45"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">https://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span>
+
+</code></pre>
+
+<p>Authorizes and immediately charges a payment for the specified amount.  The value is held in escrow until a payout is disbursed.</p>
+
+<h3 id="request-reference">Request Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>payment_method_id</td>
+<td>String</td>
+<td>Payment method must be <code class="prettyprint">active</code>.</td>
+</tr>
+<tr>
+<td>total</td>
+<td>String</td>
+<td>Excludes currency symbol.</td>
+</tr>
+<tr>
+<td>currency</td>
+<td>String</td>
+<td>Only <code class="prettyprint">USD</code> is supported at this time.</td>
+</tr>
+<tr>
+<td>note</td>
+<td>String</td>
+<td>Leaves a note for a historical purposes.</td>
+</tr>
+</tbody></table>
+
+<h2 id="payment-status">Payment Status</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+</code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"payment_method_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"d646e985-b895-4fb6-b121-b221e5daa9db"</span><span class="p">,</span><span class="w"> 
+  </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"complete"</span><span class="p">,</span><span class="w">
+</span><span class="err">}</span><span class="w">
+</span></code></pre>
+
+<p>Check on the status of the payment.</p>
+
+<h3 id="request-reference">Request Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>payment_method_id</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>Values include <code class="prettyprint">complete</code>, <code class="prettyprint">pending</code>, and <code class="prettyprint">failed</code></td>
+</tr>
+<tr>
+<td>note</td>
+<td>String</td>
+<td>Leaves a note for a historical purposes.</td>
+</tr>
+</tbody></table>
+
+<h1 id="payouts">Payouts</h1>
+
+<h2 id="capture-payout-method">Capture Payout Method</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/payoutmethods</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"routing_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456789"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"account_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"951623847"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">https://api.depositguard.com/payoutmethods/4e3acbb9-b99d-4933-8bf0-8d2fdcd11b03</span>
+
+</code></pre>
+
+<p>The landlord needs to provide disbursement information for DepositGuard to payout to.  Functions the same as above, but has a different form name.</p>
+
+<aside class="notice">
+Disbursements can only be made via ACH transfer to a bank account.
+</aside>
+
+<h3 id="request-reference">Request Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>external_id</td>
+<td>String</td>
+<td><code class="prettyprint">Optional.</code>  Can be used to match DepositGuard payment methods with the integrator&rsquo;s systems.</td>
+</tr>
+<tr>
+<td>routing_number</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>account_number</td>
+<td>String</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h2 id="get-payout-method">Get Payout Method</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/payoutmethods/4e3acbb9-b99d-4933-8bf0-8d2fdcd11b03</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+</code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="w">
+</span><span class="p">{</span><span class="w">
+  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w">  </span><span class="s2">"active"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"routing_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456789"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"account_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"951623847"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Get a payout method to view its status and details.</p>
+
+<h3 id="response-reference">Response Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The current status of the payout method.  Values include <code class="prettyprint">active</code> and <code class="prettyprint">inactive</code>.</td>
+</tr>
+</tbody></table>
+
+<h2 id="payout">Payout</h2>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"payout_method_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6dcbd862-e01d-4639-a5b4-774bda55ed09"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"amount"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123.45"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">https://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span>
+
+</code></pre>
+
+<p>Disburses funds from the escrow pool.  Typically takes 3 to 7 business days.</p>
+
+<h3 id="request-reference">Request Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>payment_method_id</td>
+<td>String</td>
+<td>Payment method must be <code class="prettyprint">active</code>.</td>
+</tr>
+<tr>
+<td>total</td>
+<td>String</td>
+<td>Excludes currency symbol.</td>
+</tr>
+<tr>
+<td>currency</td>
+<td>String</td>
+<td>Only <code class="prettyprint">USD</code> is supported at this time.</td>
+</tr>
+<tr>
+<td>note</td>
+<td>String</td>
+<td>Leaves a note for a historical purposes.</td>
+</tr>
+</tbody></table>
+
+<h2 id="payout-status">Payout Status</h2>
+<pre class="highlight http"><code><span class="nf">GET</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+</code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="s">{</span>
+<span class="s">  "payout_method_id": "d646e985-b895-4fb6-b121-b221e5daa9db", </span>
+<span class="s">  "note": "half of deposit",</span>
+<span class="s">  "status": "complete",</span>
+<span class="s">}</span>
+</code></pre>
+
+<p>Disburses funds from the escrow pool.  Typically takes 3 to 7 business days.</p>
+
+<h3 id="response-reference">Response Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>payout_method_id</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>Values include <code class="prettyprint">complete</code>, <code class="prettyprint">pending</code>, and <code class="prettyprint">failed</code></td>
+</tr>
+<tr>
+<td>note</td>
+<td>String</td>
+<td>Leaves a note for a historical purposes.</td>
+</tr>
+</tbody></table>
+
+          <h1 id="errors">Errors</h1>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">400</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+    </span><span class="nt">"reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Invalid input"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"errors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="mi">40006</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"field"</span><span class="p">:</span><span class="w"> </span><span class="s2">"terms.start_date"</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"start_date is required."</span><span class="p">,</span><span class="w"> 
+            </span><span class="nt">"severity"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Error"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<h3 id="status-codes">Status Codes</h3>
 
 <table><thead>
 <tr>
 <th>Error Code</th>
 <th>Meaning</th>
+<th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>400</td>
-<td>Bad Request &ndash; Your request sucks</td>
+<td>Bad Request</td>
+<td>Something is wrong with the request.  Check the error response for details.</td>
 </tr>
 <tr>
 <td>401</td>
-<td>Unauthorized &ndash; Your API key is wrong</td>
+<td>Unauthorized</td>
+<td>The authorization header is wrong or missing.  Re-authorize at <code class="prettyprint">/oauth/token</code>.</td>
 </tr>
 <tr>
 <td>403</td>
-<td>Forbidden &ndash; The kitten requested is hidden for administrators only</td>
+<td>Forbidden</td>
+<td>You&rsquo;re attempting to access a resource that does not belong to you.</td>
 </tr>
 <tr>
 <td>404</td>
-<td>Not Found &ndash; The specified kitten could not be found</td>
+<td>Not Found</td>
+<td>The resource does not exist.</td>
 </tr>
 <tr>
 <td>405</td>
-<td>Method Not Allowed &ndash; You tried to access a kitten with an invalid method</td>
-</tr>
-<tr>
-<td>406</td>
-<td>Not Acceptable &ndash; You requested a format that isn&rsquo;t json</td>
-</tr>
-<tr>
-<td>410</td>
-<td>Gone &ndash; The kitten requested has been removed from our servers</td>
-</tr>
-<tr>
-<td>418</td>
-<td>I&rsquo;m a teapot</td>
-</tr>
-<tr>
-<td>429</td>
-<td>Too Many Requests &ndash; You&rsquo;re requesting too many kittens! Slown down!</td>
+<td>Method Not Allowed</td>
+<td>The resource does not support the method.</td>
 </tr>
 <tr>
 <td>500</td>
-<td>Internal Server Error &ndash; We had a problem with our server. Try again later.</td>
+<td>Internal Server Error</td>
+<td>There&rsquo;s a problem on the DepositGuard side.</td>
 </tr>
 <tr>
 <td>503</td>
-<td>Service Unavailable &ndash; We&rsquo;re temporarially offline for maintanance. Please try again later.</td>
+<td>Service Unavailable</td>
+<td>DepositGuard is temporarially offline for maintanance. Please try again later.</td>
 </tr>
 </tbody></table>
 
       </div>
       <div class="dark-box">
           <div class="lang-selector">
-                <a href="#" data-language-name="shell">shell</a>
-                <a href="#" data-language-name="ruby">ruby</a>
-                <a href="#" data-language-name="python">python</a>
+                <a href="#" data-language-name="HTTP">HTTP</a>
           </div>
       </div>
     </div>
