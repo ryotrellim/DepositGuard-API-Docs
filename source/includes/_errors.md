@@ -1,20 +1,31 @@
 # Errors
 
-<aside class="notice">This error section is stored in a separate file in `includes/_errors.md`. Slate allows you to optionally separate out your docs into many files...just save them to the `includes` folder and add them to the top of your `index.md`'s frontmatter. Files are included in the order listed.</aside>
+``` http
+HTTP/1.1 400 OK
+Content-Type: application/json
 
-The Kittn API uses the following error codes:
+{
+    "reason": "Invalid input",
+    "errors": [
+        {
+            "code": 40006,
+            "field": "terms.start_date",
+            "reason": "start_date is required.", 
+            "severity": "Error"
+        }
+    ]
+}
+```
 
+### Status Codes
 
-Error Code | Meaning
----------- | -------
-400 | Bad Request -- Your request sucks
-401 | Unauthorized -- Your API key is wrong
-403 | Forbidden -- The kitten requested is hidden for administrators only
-404 | Not Found -- The specified kitten could not be found
-405 | Method Not Allowed -- You tried to access a kitten with an invalid method
-406 | Not Acceptable -- You requested a format that isn't json
-410 | Gone -- The kitten requested has been removed from our servers
-418 | I'm a teapot
-429 | Too Many Requests -- You're requesting too many kittens! Slow down!
-500 | Internal Server Error -- We had a problem with our server. Try again later.
-503 | Service Unavailable -- We're temporarially offline for maintanance. Please try again later.
+Error Code | Meaning | Description |
+---------- | ------- | ------- |
+400 | Bad Request | Something is wrong with the request.  Check the error response for details.
+401 | Unauthorized | The authorization header is wrong or missing.  Re-authorize at `/oauth/token`.
+403 | Forbidden | You're attempting to access a resource that does not belong to you.
+404 | Not Found | The resource does not exist.
+405 | Method Not Allowed | The resource does not support the method.
+500 | Internal Server Error | There's a problem on the DepositGuard side.
+503 | Service Unavailable | DepositGuard is temporarially offline for maintanance. Please try again later.
+

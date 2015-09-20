@@ -84,6 +84,9 @@ html, body {
   // This is the logo at the top of the ToC
   &>img {
     display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 20px;
   }
 
   &>.search {
@@ -346,7 +349,7 @@ html, body {
   }
 
   &>ul, &>ol {
-    padding-left: $main-padding + 15px;
+    padding-left: $main-padding + 30px;
   }
 
   // the div is the tocify hidden div for placeholding stuff
