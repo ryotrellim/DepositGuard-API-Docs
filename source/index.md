@@ -30,6 +30,8 @@ The DepositGuard API offers simple and secure ways to create, fund, and manage e
 * An `authorization` header is required in every request.
 * A `location` header is returned any time a resource is created.  The resource identifier can be attained by parsing the url returned.
 
+### Root URI
+Use `http://api.depositguard.net` as your root.  For example, authorization would occur at `http://api.depositguard.net/oauth/token`.
 
 ### Need Access or Help?
 Request credentials to the DepositGuard API or ask for assistance by emailing [api@depositguard.com](mailto:api@depositguard.com).
@@ -40,10 +42,10 @@ Request credentials to the DepositGuard API or ask for assistance by emailing [a
 > Unlike all subsequent requests, the authentication endpoint requires the "application/x-www-form-urlencoded' content-type.
 
 ```http
-POST /oauth/token HTTP/1.1
+POST /oauth/token_authenticated HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
 Authorization: Basic <Base64 encoded string of “clientId:secret”>
-Host: api.depositguard.com
+Host: api.depositguard.net
 
 grant_type=client_credentials
 ```
@@ -59,6 +61,13 @@ Content-Type: application/json
 ```
 
 Authenticate your application to make requests using an OAuth2 client credentials pattern.  Your application will then be *authorized* to manage any resources (agreements, payment methods, etc.) that it creates or owns.
+
+### Request Reference
+Parameter | Type | Description
+--------- | ------- | -----------
+input body | String | The simple string "grant_type=client_credentials" is the only input accepted.
+authorization header | String | Use HTTP basic auth for the initial request.  This is the _only_ resource that should use your clientId and secret.  To make test calls, use these credentials: </br></br> ClientId = `TestClientId` </br></br> Secret = `TestSecret`
+
 
 ### Response Reference
 Parameter | Type | Description
@@ -79,7 +88,7 @@ It is not possible to refresh the access token.  You must attain another when th
 POST /agreements HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 
 {
   "external_id": "123456",
@@ -120,7 +129,7 @@ Host: api.depositguard.com
 ```
 ``` http
 HTTP/1.1 201 Created
-Location:  https://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db
+Location:  http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db
 
 ```
 
@@ -169,7 +178,7 @@ address_line2 | String |
 GET /agreements/d646e985-b895-4fb6-b121-b221e5daa9db HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 ```
 
 ``` http
@@ -231,7 +240,7 @@ status | String | The current status of the agreement.  Values include: </br></b
 PUT /agreements/d646e985-b895-4fb6-b121-b221e5daa9db HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 ```
 
 ``` http
@@ -254,7 +263,7 @@ status | String | The current status of the agreement.  Values include: </br></b
 POST /agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 
 {
   "note": "renter cancelled trip."
@@ -263,7 +272,7 @@ Host: api.depositguard.com
 
 ``` http
 HTTP/1.1 201 Created
-Location:  http://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/history
+Location:  http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/history
 ```
 
 Cancels the agreement and all payments and payouts.  The agreement cannot be re-activated or resumed.  This can only be performed prior to the first payment.
@@ -281,14 +290,14 @@ note | String | `Optional.` Leaves a note for a historical purposes.
 POST /agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 
 {}
 ```
 
 ``` http
 HTTP/1.1 201 Created
-Location:  http://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/complete
+Location:  http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/complete
 ```
 
 Completes the agreement.  Use this when the agreement terms are fulfilled and all parties are satisfied.
@@ -305,7 +314,7 @@ note | String | `Optional.` Leaves a note for a historical purposes.
 POST /agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 
 {
   "notes": "renter requested and was sent images of property"
@@ -314,7 +323,7 @@ Host: api.depositguard.com
 
 ``` http
 HTTP/1.1 201 Created
-Location:  http://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/notes
+Location:  http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/notes
 ```
 
 Add an additional note to the agreement.
@@ -332,7 +341,7 @@ note | String | Leaves a note for a historical purposes.
 GET /agreements/d646e985-b895-4fb6-b121-b221e5daa9db/history HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 ```
 
 ``` http
@@ -395,11 +404,11 @@ note | String | Returned if any note was left.
 POST /paymentmethods HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 
 {
   "external_id": "123456",
-  "number": "1234567890",
+  "number": "4111-1111-1111-1111",
   "name": "John B. Doe",
   "cvv": "123",
   "exp_month": "12",
@@ -413,7 +422,7 @@ Host: api.depositguard.com
 ```
 ``` http
 HTTP/1.1 201 Created
-Location:  https://api.depositguard.com/paymentmethods/6dcbd862-e01d-4639-a5b4-774bda55ed09
+Location:  http://api.depositguard.net/paymentmethods/6dcbd862-e01d-4639-a5b4-774bda55ed09
 
 
 ```
@@ -434,7 +443,7 @@ Payment methods are not explicitly associated with a user or with an agreement.
 Parameter | Type | Description
 --------- | ------- | -----------
 external_id | String | `Optional.`  Can be used to match DepositGuard payment methods with the integrator's systems.
-number | String | 
+number | String | 16-digit debit or credit card number with dashes.  Use `4111-1111-1111-1111` to test.
 name | String |
 cvv | String
 exp_month | String
@@ -452,7 +461,7 @@ address-line2 | String
 POST /paymentmethods/6dcbd862-e01d-4639-a5b4-774bda55ed09 HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 ```
 ``` http
 HTTP/1.1 200 OK
@@ -462,7 +471,7 @@ Content-Type: application/json
   "payment_method_id": "6dcbd862-e01d-4639-a5b4-774bda55ed09", 
   "external_id": "123456",
   "status": "active",
-  "number": "1234567890",
+  "number": "4111-1111-1111-1111",
   "name": "John B. Doe",
   "cvv": "123",
   "exp_month": "12",
@@ -493,7 +502,7 @@ status | String | The current status of the payment method.  Values include `act
 POST /agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 
 {
   "payment_method_id": "6dcbd862-e01d-4639-a5b4-774bda55ed09",  // required
@@ -506,7 +515,7 @@ Host: api.depositguard.com
 ```
 ``` http
 HTTP/1.1 201 Created
-Location:  https://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits/eaf557ca-ee95-4939-951a-bd2b2e1047ce
+Location:  http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits/eaf557ca-ee95-4939-951a-bd2b2e1047ce
 
 ```
 
@@ -526,7 +535,7 @@ note | String | Leaves a note for a historical purposes.
 ```http
 POST /agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits/eaf557ca-ee95-4939-951a-bd2b2e1047ce HTTP/1.1
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 ```
 ``` http
 HTTP/1.1 200 OK
@@ -558,7 +567,7 @@ note | String | Leaves a note for a historical purposes.
 POST /payoutmethods HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 
 {
   "external_id": "123456",
@@ -568,7 +577,7 @@ Host: api.depositguard.com
 ```
 ``` http
 HTTP/1.1 201 Created
-Location:  https://api.depositguard.com/payoutmethods/4e3acbb9-b99d-4933-8bf0-8d2fdcd11b03
+Location:  http://api.depositguard.net/payoutmethods/4e3acbb9-b99d-4933-8bf0-8d2fdcd11b03
 
 ```
 
@@ -594,7 +603,7 @@ account_number | String |
 ```http
 POST /payoutmethods/4e3acbb9-b99d-4933-8bf0-8d2fdcd11b03 HTTP/1.1
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 ```
 ``` http
 HTTP/1.1 201 Created
@@ -625,7 +634,7 @@ status | String | The current status of the payout method.  Values include `acti
 POST /agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 
 {
   "payout_method_id": "6dcbd862-e01d-4639-a5b4-774bda55ed09",
@@ -638,7 +647,7 @@ Host: api.depositguard.com
 ```
 ``` http
 HTTP/1.1 204 No Content
-Location:  https://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements/eaf557ca-ee95-4939-951a-bd2b2e1047ce
+Location:  http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements/eaf557ca-ee95-4939-951a-bd2b2e1047ce
 
 ```
 
@@ -647,7 +656,7 @@ Disburses funds from the escrow pool.  Typically takes 3 to 7 business days.
 ### Request Reference
 Parameter | Type | Description
 --------- | ------- | -----------
-payment_method_id | String | Payment method must be `active`.
+payout_method_id | String | Payment method must be `active`.
 total | String | Excludes currency symbol.
 currency | String | Only `USD` is supported at this time.
 note | String | Leaves a note for a historical purposes.
@@ -659,7 +668,7 @@ note | String | Leaves a note for a historical purposes.
 ```http
 GET /agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements/eaf557ca-ee95-4939-951a-bd2b2e1047ce HTTP/1.1
 Authorization: Bearer <Access-Token>
-Host: api.depositguard.com
+Host: api.depositguard.net
 ```
 ``` http
 HTTP/1.1 200 OK
