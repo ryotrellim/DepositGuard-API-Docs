@@ -13,7 +13,7 @@
 
       <script>
         $(function() {
-          setupLanguages(["HTTP"]);
+          setupLanguages(["HTTP \u0026 Javscript"]);
         });
       </script>
   </head>
@@ -27,7 +27,7 @@
     <div class="tocify-wrapper">
       <img src="images/logo.png" />
         <div class="lang-selector">
-              <a href="#" data-language-name="HTTP">HTTP</a>
+              <a href="#" data-language-name="HTTP & Javscript">HTTP & Javscript</a>
         </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
@@ -67,10 +67,6 @@
 <li>A <code class="prettyprint">location</code> header is returned any time a resource is created.  The resource identifier can be attained by parsing the url returned.</li>
 </ul>
 
-<h3 id="root-uri">Root URI</h3>
-
-<p>Use <code class="prettyprint">http://api.depositguard.net</code> as your root.  For example, authorization would occur at <code class="prettyprint">http://api.depositguard.net/oauth/token</code>.</p>
-
 <h3 id="need-access-or-help">Need Access or Help?</h3>
 
 <p>Request credentials to the DepositGuard API or ask for assistance by emailing <a href="mailto:api@depositguard.com">api@depositguard.com</a>.</p>
@@ -80,10 +76,10 @@
 <blockquote>
 <p>Unlike all subsequent requests, the authentication endpoint requires the &ldquo;application/x-www-form-urlencoded&rsquo; content-type.</p>
 </blockquote>
-<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/oauth/token_authenticated</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/oauth/token</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/x-www-form-urlencoded</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Basic &lt;Base64 encoded string of “clientId:secret”&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
 grant_type=client_credentials
 </code></pre>
@@ -99,27 +95,6 @@ grant_type=client_credentials
 
 <p>Authenticate your application to make requests using an OAuth2 client credentials pattern.  Your application will then be <em>authorized</em> to manage any resources (agreements, payment methods, etc.) that it creates or owns.</p>
 
-<h3 id="request-reference">Request Reference</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>input body</td>
-<td>String</td>
-<td>The simple string &quot;grant_type=client_credentials&rdquo; is the only input accepted.</td>
-</tr>
-<tr>
-<td>authorization header</td>
-<td>String</td>
-<td>Use HTTP basic auth for the initial request.  This is the <em>only</em> resource that should use your clientId and secret.  To make test calls, use these credentials: </br></br> ClientId = <code class="prettyprint">TestClientId</code> </br></br> Secret = <code class="prettyprint">TestSecret</code></td>
-</tr>
-</tbody></table>
-
 <h3 id="response-reference">Response Reference</h3>
 
 <table><thead>
@@ -132,7 +107,7 @@ grant_type=client_credentials
 <tr>
 <td>access_token</td>
 <td>String</td>
-<td>Prepend this string with &ldquo;Bearer&rdquo; (the token type) and use it as the authorization header in all requests until it expires.</td>
+<td>Prepend this string with &quot;Bearer&rdquo; (the token type) and use it as the authorization header in all requests until it expires.</td>
 </tr>
 <tr>
 <td>token_type</td>
@@ -156,7 +131,7 @@ It is not possible to refresh the access token.  You must attain another when th
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
 <span class="p">{</span><span class="w">
   </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
@@ -196,7 +171,7 @@ It is not possible to refresh the access token.  You must attain another when th
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
-<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">https://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db</span>
 
 </code></pre>
 
@@ -311,7 +286,7 @@ It is not possible to refresh the access token.  You must attain another when th
 <pre class="highlight http"><code><span class="nf">GET</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 </code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
@@ -383,7 +358,7 @@ It is not possible to refresh the access token.  You must attain another when th
 <pre class="highlight http"><code><span class="nf">PUT</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 </code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
 </code></pre>
@@ -415,14 +390,14 @@ It is not possible to refresh the access token.  You must attain another when th
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
 <span class="p">{</span><span class="w">
   </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"renter cancelled trip."</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
-<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/history</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/history</span>
 </code></pre>
 
 <p>Cancels the agreement and all payments and payouts.  The agreement cannot be re-activated or resumed.  This can only be performed prior to the first payment.</p>
@@ -447,12 +422,12 @@ It is not possible to refresh the access token.  You must attain another when th
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
 <span class="p">{}</span><span class="w">
 </span></code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
-<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/complete</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/complete</span>
 </code></pre>
 
 <p>Completes the agreement.  Use this when the agreement terms are fulfilled and all parties are satisfied.</p>
@@ -477,14 +452,14 @@ It is not possible to refresh the access token.  You must attain another when th
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
 <span class="p">{</span><span class="w">
   </span><span class="nt">"notes"</span><span class="p">:</span><span class="w"> </span><span class="s2">"renter requested and was sent images of property"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
-<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/notes</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/notes</span>
 </code></pre>
 
 <p>Add an additional note to the agreement.</p>
@@ -509,7 +484,7 @@ It is not possible to refresh the access token.  You must attain another when th
 <pre class="highlight http"><code><span class="nf">GET</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/history</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 </code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
@@ -584,32 +559,21 @@ It is not possible to refresh the access token.  You must attain another when th
 <h1 id="payments">Payments</h1>
 
 <h2 id="capture-payment-method">Capture Payment Method</h2>
-<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/paymentmethods</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
-
-<span class="p">{</span><span class="w">
-  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4111-1111-1111-1111"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"John B. Doe"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"cvv"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"exp_month"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"exp_year"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2021"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Austin"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TX"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78704"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"address_line1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123 4th Street"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"address_line2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Apt. 456"</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
-<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
-<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.net/paymentmethods/6dcbd862-e01d-4639-a5b4-774bda55ed09</span>
-
-
+<pre class="highlight html"><code><span class="c">&lt;!-- Create a form element where the drop-in UI will go --&gt;</span>
+<span class="nt">&lt;form&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"cc-input-container"</span><span class="nt">&gt;&lt;/div&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="c1">// This adds form fields in the specified container to collect credit card number, expiration date, CVV, and a hidden payment_method_nonce value.</span>
+<span class="c1">// Note the Access-Token that comes from the server-side authentication call above.</span>
+<span class="nx">depositguard</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s2">"&lt;Access-Token&gt;"</span><span class="p">,</span> <span class="s2">"cc"</span> <span class="p">{</span>
+  <span class="nl">container</span><span class="p">:</span> <span class="s2">"cc-input-container"</span>
+<span class="p">});</span>
 </code></pre>
 
-<p>The renter needs to provide payment information to fund the escrow account and eventually pay the landlord.  Use the external_customer_id property to connect the payment method to the user in your system.</p>
+<p>The renter needs to provide payment information to fund the escrow account and eventually pay the landlord.  This can be accomplished in multiple ways.</p>
+
+<p>A drop-in UI provides a simple interface for the end-user to enter their credit card information.  Because the interface is provided in an iframe and hosted by DepositGuard, this reduces the PCI compliance burden to a much less rigorous SAQ-A form.</p>
 
 <aside class="notice">
 Payments can only be made with a credit card.</br>
@@ -619,130 +583,14 @@ Payments can only be made with a credit card.</br>
 Payment methods are not explicitly associated with a user or with an agreement.
 </aside>
 
-<h3 id="request-reference">Request Reference</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>external_id</td>
-<td>String</td>
-<td><code class="prettyprint">Optional.</code>  Can be used to match DepositGuard payment methods with the integrator&rsquo;s systems.</td>
-</tr>
-<tr>
-<td>number</td>
-<td>String</td>
-<td>16-digit debit or credit card number with dashes.  Use <code class="prettyprint">4111-1111-1111-1111</code> to test.</td>
-</tr>
-<tr>
-<td>name</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>cvv</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>exp_month</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>exp_year</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>city</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>state</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>postal_code</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>address_line1</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>address-line2</td>
-<td>String</td>
-<td></td>
-</tr>
-</tbody></table>
-
-<h2 id="get-payment-method">Get Payment Method</h2>
-<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/paymentmethods/6dcbd862-e01d-4639-a5b4-774bda55ed09</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
-</code></pre>
-<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
-<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-
-<span class="p">{</span><span class="w">
-  </span><span class="nt">"payment_method_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6dcbd862-e01d-4639-a5b4-774bda55ed09"</span><span class="p">,</span><span class="w"> 
-  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4111-1111-1111-1111"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"John B. Doe"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"cvv"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"exp_month"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"exp_year"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2021"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Austin"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TX"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78704"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"address_line1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123 4th Street"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"address_line2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Apt. 456"</span><span class="w">
-</span><span class="p">}</span><span class="w">
-
-</span></code></pre>
-
-<p>Get a payment method to view its status and details.</p>
-
-<h3 id="response-reference">Response Reference</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>payment_method_id</td>
-<td>GUID</td>
-<td>Globally unique identifier of the payment method.  Not editable.</td>
-</tr>
-<tr>
-<td>status</td>
-<td>String</td>
-<td>The current status of the payment method.  Values include <code class="prettyprint">active</code> and <code class="prettyprint">expired</code>.</td>
-</tr>
-</tbody></table>
-
 <h2 id="payment">Payment</h2>
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
 <span class="p">{</span><span class="w">
-  </span><span class="nt">"payment_method_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6dcbd862-e01d-4639-a5b4-774bda55ed09"</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">required</span><span class="w">
+  </span><span class="nt">"payment_method_nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6dcbd862-e01d-4639-a5b4-774bda55ed09"</span><span class="p">,</span><span class="w">
   </span><span class="nt">"amount"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123.45"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="w">
@@ -751,103 +599,24 @@ Payment methods are not explicitly associated with a user or with an agreement.
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
-<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span>
-
+<span class="na">Location</span><span class="p">:</span>  <span class="s">https://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span>
 </code></pre>
 
 <p>Authorizes and immediately charges a payment for the specified amount.  The value is held in escrow until a payout is disbursed.</p>
 
-<h3 id="request-reference">Request Reference</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>payment_method_id</td>
-<td>String</td>
-<td>Payment method must be <code class="prettyprint">active</code>.</td>
-</tr>
-<tr>
-<td>total</td>
-<td>String</td>
-<td>Excludes currency symbol.</td>
-</tr>
-<tr>
-<td>currency</td>
-<td>String</td>
-<td>Only <code class="prettyprint">USD</code> is supported at this time.</td>
-</tr>
-<tr>
-<td>note</td>
-<td>String</td>
-<td>Leaves a note for a historical purposes.</td>
-</tr>
-</tbody></table>
-
-<h2 id="payment-status">Payment Status</h2>
-<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
-</code></pre>
-<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
-<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-
-<span class="p">{</span><span class="w">
-  </span><span class="nt">"payment_method_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"d646e985-b895-4fb6-b121-b221e5daa9db"</span><span class="p">,</span><span class="w"> 
-  </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"complete"</span><span class="p">,</span><span class="w">
-</span><span class="err">}</span><span class="w">
-</span></code></pre>
-
-<p>Check on the status of the payment.</p>
-
-<h3 id="request-reference">Request Reference</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>payment_method_id</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>status</td>
-<td>String</td>
-<td>Values include <code class="prettyprint">complete</code>, <code class="prettyprint">pending</code>, and <code class="prettyprint">failed</code></td>
-</tr>
-<tr>
-<td>note</td>
-<td>String</td>
-<td>Leaves a note for a historical purposes.</td>
-</tr>
-</tbody></table>
-
 <h1 id="payouts">Payouts</h1>
 
 <h2 id="capture-payout-method">Capture Payout Method</h2>
-<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/payoutmethods</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
-
-<span class="p">{</span><span class="w">
-  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"routing_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456789"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"account_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"951623847"</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
-<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
-<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.net/payoutmethods/4e3acbb9-b99d-4933-8bf0-8d2fdcd11b03</span>
-
+<pre class="highlight html"><code><span class="c">&lt;!-- Create a form element where the drop-in UI will go --&gt;</span>
+<span class="nt">&lt;form&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"ach-input-container"</span><span class="nt">&gt;&lt;/div&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="c1">// This adds form fields in the specified container to collect routing number, account number, and a hidden payment_method_nonce value.</span>
+<span class="c1">// Note the Access-Token that comes from the server-side authentication call above.</span>
+<span class="nx">depositguard</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s2">"&lt;Access-Token&gt;"</span><span class="p">,</span> <span class="s2">"ach"</span> <span class="p">{</span>
+  <span class="nl">container</span><span class="p">:</span> <span class="s2">"ach-input-container"</span>
+<span class="p">});</span>
 </code></pre>
 
 <p>The landlord needs to provide disbursement information for DepositGuard to payout to.  Functions the same as above, but has a different form name.</p>
@@ -856,75 +625,14 @@ Payment methods are not explicitly associated with a user or with an agreement.
 Disbursements can only be made via ACH transfer to a bank account.
 </aside>
 
-<h3 id="request-reference">Request Reference</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>external_id</td>
-<td>String</td>
-<td><code class="prettyprint">Optional.</code>  Can be used to match DepositGuard payment methods with the integrator&rsquo;s systems.</td>
-</tr>
-<tr>
-<td>routing_number</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>account_number</td>
-<td>String</td>
-<td></td>
-</tr>
-</tbody></table>
-
-<h2 id="get-payout-method">Get Payout Method</h2>
-<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/payoutmethods/4e3acbb9-b99d-4933-8bf0-8d2fdcd11b03</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
-</code></pre>
-<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
-<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-
-<span class="w">
-</span><span class="p">{</span><span class="w">
-  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"status"</span><span class="p">:</span><span class="w">  </span><span class="s2">"active"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"routing_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456789"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"account_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"951623847"</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
-
-<p>Get a payout method to view its status and details.</p>
-
-<h3 id="response-reference">Response Reference</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>status</td>
-<td>String</td>
-<td>The current status of the payout method.  Values include <code class="prettyprint">active</code> and <code class="prettyprint">inactive</code>.</td>
-</tr>
-</tbody></table>
-
 <h2 id="payout">Payout</h2>
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
 <span class="p">{</span><span class="w">
-  </span><span class="nt">"payout_method_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6dcbd862-e01d-4639-a5b4-774bda55ed09"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"payout_method_nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6dcbd862-e01d-4639-a5b4-774bda55ed09"</span><span class="p">,</span><span class="w">
   </span><span class="nt">"amount"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123.45"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="w">
@@ -933,84 +641,11 @@ Disbursements can only be made via ACH transfer to a bank account.
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
-<span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.net/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span>
+<span class="na">Location</span><span class="p">:</span>  <span class="s">https://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span>
 
 </code></pre>
 
 <p>Disburses funds from the escrow pool.  Typically takes 3 to 7 business days.</p>
-
-<h3 id="request-reference">Request Reference</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>payout_method_id</td>
-<td>String</td>
-<td>Payment method must be <code class="prettyprint">active</code>.</td>
-</tr>
-<tr>
-<td>total</td>
-<td>String</td>
-<td>Excludes currency symbol.</td>
-</tr>
-<tr>
-<td>currency</td>
-<td>String</td>
-<td>Only <code class="prettyprint">USD</code> is supported at this time.</td>
-</tr>
-<tr>
-<td>note</td>
-<td>String</td>
-<td>Leaves a note for a historical purposes.</td>
-</tr>
-</tbody></table>
-
-<h2 id="payout-status">Payout Status</h2>
-<pre class="highlight http"><code><span class="nf">GET</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/disbursements/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
-<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.net</span>
-</code></pre>
-<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
-<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-<span class="s">{</span>
-<span class="s">  "payout_method_id": "d646e985-b895-4fb6-b121-b221e5daa9db", </span>
-<span class="s">  "note": "half of deposit",</span>
-<span class="s">  "status": "complete",</span>
-<span class="s">}</span>
-</code></pre>
-
-<p>Disburses funds from the escrow pool.  Typically takes 3 to 7 business days.</p>
-
-<h3 id="response-reference">Response Reference</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>payout_method_id</td>
-<td>String</td>
-<td></td>
-</tr>
-<tr>
-<td>status</td>
-<td>String</td>
-<td>Values include <code class="prettyprint">complete</code>, <code class="prettyprint">pending</code>, and <code class="prettyprint">failed</code></td>
-</tr>
-<tr>
-<td>note</td>
-<td>String</td>
-<td>Leaves a note for a historical purposes.</td>
-</tr>
-</tbody></table>
 
           <h1 id="errors">Errors</h1>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">400</span> <span class="ne">OK</span>
@@ -1078,7 +713,7 @@ Disbursements can only be made via ACH transfer to a bank account.
       </div>
       <div class="dark-box">
           <div class="lang-selector">
-                <a href="#" data-language-name="HTTP">HTTP</a>
+                <a href="#" data-language-name="HTTP & Javscript">HTTP & Javscript</a>
           </div>
       </div>
     </div>
