@@ -73,7 +73,7 @@
 
 <p>Request credentials to the DepositGuard API or ask for assistance by emailing <a href="mailto:api@depositguard.com">api@depositguard.com</a>.</p>
 
-<h1 id="authentication">Authentication</h1>
+          <h1 id="authentication">Authentication</h1>
 
 <h2 id="server-side-token">Server-Side Token</h2>
 
@@ -181,7 +181,7 @@ grant_type=client_credentials
 </tr>
 </tbody></table>
 
-<h1 id="agreements">Agreements</h1>
+          <h1 id="agreements">Agreements</h1>
 
 <p>Agreements are a necessary part of the DepositGuard API.  They establish trust and the bounds in which a transaction is expected to take place.  </p>
 
@@ -193,7 +193,7 @@ grant_type=client_credentials
 
 <span class="p">{</span><span class="w">
   </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"active"</span><span class="p">,</span><span class="w">
   </span><span class="nt">"terms"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nt">"dates"</span><span class="p">:{</span><span class="w">
        </span><span class="nt">"start_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YYYY-MM-dd 12:34:56Z"</span><span class="p">,</span><span class="w">
@@ -240,8 +240,7 @@ grant_type=client_credentials
 
 <h3 id="request-reference">Request Reference</h3>
 
-<p></br>
-<strong>Root</strong></p>
+<p><strong>Root</strong></p>
 
 <table><thead>
 <tr>
@@ -258,12 +257,11 @@ grant_type=client_credentials
 <tr>
 <td>status</td>
 <td>String</td>
-<td>The current status of the agreement.  Values include: </br></br><code class="prettyprint">active</code> - The default staus of a new agreement</br></br><code class="prettyprint">completed</code> - Used when a an agreement terms are satisfied and disbursement is complete</br></br><code class="prettyprint">cancelled</code> - Used when an agreement is no longer valid.</td>
+<td>The current status of the agreement.  Values include: <code class="prettyprint">active</code> - The default staus of a new agreement.  <code class="prettyprint">completed</code> - Used when a an agreement terms are satisfied and disbursement is complete.  <code class="prettyprint">cancelled</code> - Used when an agreement is no longer valid.</td>
 </tr>
 </tbody></table>
 
-<p></br>
-<strong>Terms</strong></p>
+<p><strong>Terms</strong></p>
 
 <table><thead>
 <tr>
@@ -289,8 +287,7 @@ grant_type=client_credentials
 </tr>
 </tbody></table>
 
-<p></br>
-<strong>Renter &amp; Landlord</strong></p>
+<p><strong>Renter &amp; Landlord</strong></p>
 
 <table><thead>
 <tr>
@@ -414,7 +411,7 @@ grant_type=client_credentials
 <tr>
 <td>status</td>
 <td>String</td>
-<td>The current status of the agreement.  Values include: </br></br><code class="prettyprint">active</code> - The default staus of a new agreement</br></br><code class="prettyprint">completed</code> - Used when a an agreement terms are satisfied and disbursement is complete</br></br><code class="prettyprint">cancelled</code> - Used when an agreement is no longer valid.</td>
+<td>The current status of the agreement.  Values include: <code class="prettyprint">active</code> - The default staus of a new agreement.  <code class="prettyprint">completed</code> - Used when a an agreement terms are satisfied and disbursement is complete.  <code class="prettyprint">cancelled</code> - Used when an agreement is no longer valid.</td>
 </tr>
 </tbody></table>
 
@@ -430,7 +427,6 @@ grant_type=client_credentials
 
 <span class="p">{</span><span class="w">
   </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="p">,</span><span class="w">
   </span><span class="nt">"terms"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nt">"dates"</span><span class="p">:{</span><span class="w">
        </span><span class="nt">"start_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YYYY-MM-dd 12:34:56Z"</span><span class="p">,</span><span class="w">
@@ -469,7 +465,7 @@ grant_type=client_credentials
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
 </code></pre>
 
-<p>Modifying an agreement requires a <em>full PUT</em>, meaning the entire agreement must be re-submitted if any part changes.</p>
+<p>Modify an agreement to change the terms, contact information, or status.  </p>
 
 <h2 id="cancel-agreement">Cancel Agreement</h2>
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
@@ -520,8 +516,7 @@ grant_type=client_credentials
 
 <p>Completes the agreement.  Use this when the agreement terms are fulfilled and all parties are satisfied.</p>
 
-<h3 id="request-reference">Request Reference</h3>
-
+<h3 id="request-reference">Request Reference
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -552,7 +547,7 @@ grant_type=client_credentials
 
 <p>Add an additional note to the agreement.</p>
 
-request-reference&rdquo;>Request Reference</h3>
+<h3 id="request-reference">Request Reference</h3>
 
 <table><thead>
 <tr>
@@ -645,7 +640,7 @@ request-reference&rdquo;>Request Reference</h3>
 </tr>
 </tbody></table>
 
-<h1 id="payments">Payments</h1>
+          <h1 id="payments">Payments</h1>
 
 <p>The core of the DepositGuard API is the ability to securely capture and transfer funds.</p>
 
@@ -711,7 +706,8 @@ request-reference&rdquo;>Request Reference</h3>
 
 <p>The renter needs to provide payment information to fund the account and eventually pay the landlord.  To do this, capture the information in a typical web form and submit the data directly to DepositGuard.  This is known in the industry as a direct post method (DPM).</p>
 
-<h3 id="direct-post-method-flow">Direct Post Method Flow
+<h3 id="direct-post-method-flow">Direct Post Method Flow</h3>
+
 <ol>
 <li> Post (via form) the user&rsquo;s credit card info, form key, and redirect url directly to DepositGuard.</li>
 <li> DepositGuard confirms the credit card and returns the user and a credit card <em>nonce</em> to the redirect url provided.</li>
@@ -791,7 +787,7 @@ Unlike the payment itself, payment methods are not explicitly associated with a 
 Remember that the renter will receive their security deposit back on the card(s) used at the time that agreement is completed.
 </aside>
 
-payouts&quot;>Payouts</h1>
+          <h1 id="payouts">Payouts</h1>
 
 <h2 id="capture-payout-method">Capture Payout Method</h2>
 <pre class="highlight html"><code><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"http://api.depositguard.net/payoutmethods"</span> 
