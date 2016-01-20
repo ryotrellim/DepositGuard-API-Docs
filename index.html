@@ -13,7 +13,7 @@
 
       <script>
         $(function() {
-          setupLanguages(["HTTP \u0026 Javscript"]);
+          setupLanguages(["HTTP \u0026 HTML"]);
         });
       </script>
   </head>
@@ -27,7 +27,7 @@
     <div class="tocify-wrapper">
       <img src="images/logo.png" />
         <div class="lang-selector">
-              <a href="#" data-language-name="HTTP & Javscript">HTTP & Javscript</a>
+              <a href="#" data-language-name="HTTP & HTML">HTTP & HTML</a>
         </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
@@ -41,7 +41,7 @@
       <div class="content">
         <h1 id="depositguard-api">DepositGuard API</h1>
 
-<p>The DepositGuard API offers simple and secure ways to create, fund, and manage escrow accounts for vacation and rental properties.</p>
+<p>The DepositGuard API offers simple and secure ways to manage funds for vacation and rental properties.</p>
 
 <blockquote>
 <p>Example HTTP requests and responses are available below.</p>
@@ -50,9 +50,10 @@
 <h3 id="typical-flow">Typical Flow</h3>
 
 <ol>
+<li> Collect client and server-side tokens.</li>
 <li> Create an agreement.</li>
-<li> Collect payment methods.</li>
-<li> Deposit funds into escrow.</li>
+<li> Collect payment methods (with a direct post to DepositGuard).</li>
+<li> Capture funds.</li>
 <li> Collect payout methods.</li>
 <li> Disburse security deposits and fees.</li>
 </ol>
@@ -62,9 +63,10 @@
 <h3 id="important-headers">Important Headers</h3>
 
 <ul>
-<li>The only supported <code class="prettyprint">content-type</code> is &ldquo;application/json&rdquo; and is required in every request.</li>
-<li>An <code class="prettyprint">authorization</code> header is required in every request.</li>
-<li>A <code class="prettyprint">location</code> header is returned any time a resource is created.  The resource identifier can be attained by parsing the url returned.</li>
+<li>The <code class="prettyprint">content-type</code> header specifies the format of the request.  It is &lsquo;application/x-www-form-urlencoded&rsquo; when authenticating, and &#39;application/json&rsquo; otherwise.<br></li>
+<li>The <code class="prettyprint">authorization</code> header confirms your application credentials when making server-side calls.</li>
+<li>A <code class="prettyprint">location</code> header is returned any time a resource is created.</li>
+<li>The <code class="prettyprint">response-type</code> will always be &#39;application/json&rsquo;.</li>
 </ul>
 
 <h3 id="need-access-or-help">Need Access or Help?</h3>
@@ -73,8 +75,10 @@
 
 <h1 id="authentication">Authentication</h1>
 
+<h2 id="server-side-token">Server-Side Token</h2>
+
 <blockquote>
-<p>Unlike all subsequent requests, the authentication endpoint requires the &ldquo;application/x-www-form-urlencoded&rsquo; content-type.</p>
+<p>Note the URL to receive the server-side token is /oauth/token </p>
 </blockquote>
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/oauth/token</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/x-www-form-urlencoded</span>
@@ -107,7 +111,7 @@ grant_type=client_credentials
 <tr>
 <td>access_token</td>
 <td>String</td>
-<td>Prepend this string with &quot;Bearer&rdquo; (the token type) and use it as the authorization header in all requests until it expires.</td>
+<td>Prepend this string with &ldquo;Bearer&rdquo; (the token type) and use it as the authorization header in all requests until it expires.</td>
 </tr>
 <tr>
 <td>token_type</td>
@@ -125,7 +129,57 @@ grant_type=client_credentials
 It is not possible to refresh the access token.  You must attain another when the token expires.
 </aside>
 
+<aside class="notice">
+Unlike all subsequent requests, the authentication endpoint requires the &ldquo;application/x-www-form-urlencoded&rsquo; content-type.
+</aside>
+
+<h2 id="client-side-key">Client-Side Key</h2>
+
+<blockquote>
+<p>Note the URL to receive a client-side key is /oauth/key </p>
+</blockquote>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/oauth/key</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/x-www-form-urlencoded</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Basic &lt;Base64 encoded string of “clientId:secret”&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+
+grant_type=client_credentials
+</code></pre>
+<pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"access_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;Access-Key&gt;"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"expires_in"</span><span class="p">:</span><span class="w"> </span><span class="mi">28800</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>A client-side key is acquired seperately because </p>
+
+<h3 id="response-reference">Response Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>access_key</td>
+<td>String</td>
+<td>Add this as a hidden form field when submitting the user&rsquo;s payment method directly to Deposit Guard.</td>
+</tr>
+<tr>
+<td>expires_in</td>
+<td>Integer</td>
+<td>Time in milleseconds until the access token expires and a new one must be attained.</td>
+</tr>
+</tbody></table>
+
 <h1 id="agreements">Agreements</h1>
+
+<p>Agreements </p>
 
 <h2 id="create-agreement">Create Agreement</h2>
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
@@ -175,7 +229,7 @@ It is not possible to refresh the access token.  You must attain another when th
 
 </code></pre>
 
-<p>An agreement is required before transfering funds to the DepositGuard escrow and should be communicated and agreed to by all parties involved.</p>
+<p>An agreement is required before transfering funds to the DepositGuard fund and should be communicated and agreed to by all parties involved.</p>
 
 <p>All fields are required unless otherwise marked <code class="prettyprint">optional</code>.</p>
 
@@ -513,8 +567,8 @@ It is not possible to refresh the access token.  You must attain another when th
     </span><span class="p">{</span><span class="w">
       </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"charge"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="p">,</span><span class="w">
-    </span><span class="err">}</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
     </span><span class="p">{</span><span class="w">
       </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agreement_complete"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="w">
@@ -558,32 +612,90 @@ It is not possible to refresh the access token.  You must attain another when th
 
 <h1 id="payments">Payments</h1>
 
+<p>The core of the DepositGuard API is the ability to securely capture and transfer funds.</p>
+
 <h2 id="capture-payment-method">Capture Payment Method</h2>
-<pre class="highlight html"><code><span class="c">&lt;!-- Create a form element where the drop-in UI will go --&gt;</span>
-<span class="nt">&lt;form&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"cc-input-container"</span><span class="nt">&gt;&lt;/div&gt;</span>
+
+<blockquote>
+<p>The Direct Post Method requires a token that can only be used for client-side posts.</p>
+</blockquote>
+<pre class="highlight html"><code><span class="nt">&lt;html&gt;</span>
+
+<span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"http://api.depositguard.net/paymentmethods"</span> 
+  <span class="na">method=</span><span class="s">"POST"</span><span class="nt">&gt;</span> 
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"name"</span><span class="nt">&gt;</span>Name:<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"name"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"cc_number"</span><span class="nt">&gt;</span>cc_number:<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"cc_number"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"cvv"</span><span class="nt">&gt;</span>cvv:<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"cvv"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"city"</span><span class="nt">&gt;</span>city:<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"city"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"state"</span><span class="nt">&gt;</span>state:<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"state"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"postal_code"</span><span class="nt">&gt;</span>postal_code:<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"postal_code"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"address_line_1"</span><span class="nt">&gt;</span>address_line_1:<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"address_line_1"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"address_line_2"</span><span class="nt">&gt;</span>address_line_2:<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"address_line_2"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"Save Payment Method"</span><span class="nt">/&gt;</span> 
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"hidden"</span> <span class="na">name=</span><span class="s">"access_key"</span> <span class="na">value=</span><span class="s">"ABC_XYX_123"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"hidden"</span> <span class="na">name=</span><span class="s">"redirect_url"</span> <span class="na">value=</span><span class="s">"https://www.merchantsite.com/process_nonce.aspx"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/form&gt;</span>
-</code></pre>
-<pre class="highlight javascript"><code><span class="c1">// This adds form fields in the specified container to collect credit card number, expiration date, CVV, and a hidden payment_method_nonce value.</span>
-<span class="c1">// Note the Access-Token that comes from the server-side authentication call above.</span>
-<span class="nx">depositguard</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s2">"&lt;Access-Token&gt;"</span><span class="p">,</span> <span class="s2">"cc"</span> <span class="p">{</span>
-  <span class="nl">container</span><span class="p">:</span> <span class="s2">"cc-input-container"</span>
-<span class="p">});</span>
-</code></pre>
 
-<p>The renter needs to provide payment information to fund the escrow account and eventually pay the landlord.  This can be accomplished in multiple ways.</p>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/nonces/paymentmethods</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
-<p>A drop-in UI provides a simple interface for the end-user to enter their credit card information.  Because the interface is provided in an iframe and hosted by DepositGuard, this reduces the PCI compliance burden to a much less rigorous SAQ-A form.</p>
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;payment-method-nonce&gt;"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>The renter needs to provide payment information to fund the account and eventually pay the landlord.  To do this, capture the information in a typical web form and submit the data directly to DepositGuard.  This is known in the industry as a direct post method (DPM).</p>
+
+<h3 id="direct-post-method-flow">Direct Post Method Flow</h3>
+
+<ol>
+<li> Post (via form) the user&rsquo;s credit card info, form key, and redirect url directly to DepositGuard.</li>
+<li> DepositGuard confirms the credit card and returns the user and a credit card <em>nonce</em> to the redirect url provided.</li>
+<li> Activate the <em>nonce</em> with a server-side call and store it for re-use.  This step confirms to DepositGuard that the user successfully returned to the merchant&rsquo;s server and that the payment method was genuine.</li>
+<li> Submit a payment request using the <em>nonce</em> to identify the payment method.  The response will confirm if the payment was successful or respond with an appropriate error message.</li>
+</ol>
+
+<p><em>What does this mean for PCI compliance?</em>  Ultimately, every company is responsible for their own PCI compliance.  At DepositGuard, we believe that transmiting cardholder data directly to our servers reduces the scope and complexity of our integrator&rsquo;s PCI requirements.</p>
 
 <aside class="notice">
 Payments can only be made with a credit card.</br>
 </aside>
 
 <aside class="notice">
-Payment methods are not explicitly associated with a user or with an agreement.
+Unlike the payment itself, payment methods are not explicitly associated with a user or with an agreement.
 </aside>
 
-<h2 id="payment">Payment</h2>
+payment&rdquo;>Payment</h2>
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
@@ -602,24 +714,39 @@ Payment methods are not explicitly associated with a user or with an agreement.
 <span class="na">Location</span><span class="p">:</span>  <span class="s">https://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits/eaf557ca-ee95-4939-951a-bd2b2e1047ce</span>
 </code></pre>
 
-<p>Authorizes and immediately charges a payment for the specified amount.  The value is held in escrow until a payout is disbursed.</p>
+<p>Authorizes and immediately charges a payment for the specified amount.  The value is held by DepositGuard until a payout is disbursed.</p>
 
 <h1 id="payouts">Payouts</h1>
 
 <h2 id="capture-payout-method">Capture Payout Method</h2>
-<pre class="highlight html"><code><span class="c">&lt;!-- Create a form element where the drop-in UI will go --&gt;</span>
-<span class="nt">&lt;form&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"ach-input-container"</span><span class="nt">&gt;&lt;/div&gt;</span>
+<pre class="highlight html"><code><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"http://api.depositguard.net/payoutmethods"</span> 
+  <span class="na">method=</span><span class="s">"POST"</span><span class="nt">&gt;</span> 
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"account_number"</span><span class="nt">&gt;</span>Account Number:<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"account_number"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"routing_number"</span><span class="nt">&gt;</span>Routing Number:<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"routing_number"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"Save Payout Method"</span><span class="nt">/&gt;</span> 
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"hidden"</span> <span class="na">name=</span><span class="s">"key"</span> <span class="na">value=</span><span class="s">"ABC_XYX_123"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"hidden"</span> <span class="na">name=</span><span class="s">"redirect_url"</span> <span class="na">value=</span><span class="s">"https://www.merchantsite.com"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/form&gt;</span>
 </code></pre>
-<pre class="highlight javascript"><code><span class="c1">// This adds form fields in the specified container to collect routing number, account number, and a hidden payment_method_nonce value.</span>
-<span class="c1">// Note the Access-Token that comes from the server-side authentication call above.</span>
-<span class="nx">depositguard</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s2">"&lt;Access-Token&gt;"</span><span class="p">,</span> <span class="s2">"ach"</span> <span class="p">{</span>
-  <span class="nl">container</span><span class="p">:</span> <span class="s2">"ach-input-container"</span>
-<span class="p">});</span>
-</code></pre>
+<pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/nonces/payoutmethods</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
-<p>The landlord needs to provide disbursement information for DepositGuard to payout to.  Functions the same as above, but has a different form name.</p>
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;payout-method-nonce&gt;"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>The landlord needs to provide their bank account information so that DepositGuard can disburse the payout.  Functions the same as above, but has a different form action, fields, and redirect url.</p>
 
 <aside class="notice">
 Disbursements can only be made via ACH transfer to a bank account.
@@ -645,7 +772,7 @@ Disbursements can only be made via ACH transfer to a bank account.
 
 </code></pre>
 
-<p>Disburses funds from the escrow pool.  Typically takes 3 to 7 business days.</p>
+<p>Disburses funds from the fund pool.  Typically takes 3 to 7 business days.</p>
 
           <h1 id="errors">Errors</h1>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">400</span> <span class="ne">OK</span>
@@ -713,7 +840,7 @@ Disbursements can only be made via ACH transfer to a bank account.
       </div>
       <div class="dark-box">
           <div class="lang-selector">
-                <a href="#" data-language-name="HTTP & Javscript">HTTP & Javscript</a>
+                <a href="#" data-language-name="HTTP & HTML">HTTP & HTML</a>
           </div>
       </div>
     </div>
