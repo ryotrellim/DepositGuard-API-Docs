@@ -99,6 +99,10 @@ grant_type=client_credentials
 
 <p>Authenticate your application to make requests using an OAuth2 client credentials pattern.  Your application will then be <em>authorized</em> to manage any resources (agreements, payment methods, etc.) that it creates or owns.</p>
 
+<aside class="warning">
+Never share your clientId or secret and never expose these values to the client.
+</aside>
+
 <h3 id="response-reference">Response Reference</h3>
 
 <table><thead>
@@ -154,7 +158,7 @@ grant_type=client_credentials
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>A client-side key is acquired seperately because </p>
+<p>A client-side key is used seperately by the client for security reasons.</p>
 
 <h3 id="response-reference">Response Reference</h3>
 
@@ -179,7 +183,7 @@ grant_type=client_credentials
 
 <h1 id="agreements">Agreements</h1>
 
-<p>Agreements </p>
+<p>Agreements are a necessary part of the DepositGuard API.  They establish trust and the bounds in which a transaction is expected to take place.  </p>
 
 <h2 id="create-agreement">Create Agreement</h2>
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
@@ -189,6 +193,7 @@ grant_type=client_credentials
 
 <span class="p">{</span><span class="w">
   </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="p">,</span><span class="w">
   </span><span class="nt">"terms"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nt">"dates"</span><span class="p">:{</span><span class="w">
        </span><span class="nt">"start_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YYYY-MM-dd 12:34:56Z"</span><span class="p">,</span><span class="w">
@@ -249,6 +254,11 @@ grant_type=client_credentials
 <td>external_id</td>
 <td>String</td>
 <td><code class="prettyprint">Optional.</code>  Can be used to match DepositGuard agreements with the integrator&rsquo;s systems.</td>
+</tr>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The current status of the agreement.  Values include: </br></br><code class="prettyprint">active</code> - The default staus of a new agreement</br></br><code class="prettyprint">completed</code> - Used when a an agreement terms are satisfied and disbursement is complete</br></br><code class="prettyprint">cancelled</code> - Used when an agreement is no longer valid.</td>
 </tr>
 </tbody></table>
 
@@ -409,36 +419,57 @@ grant_type=client_credentials
 </tbody></table>
 
 <h2 id="modify-agreement">Modify Agreement</h2>
+
+<blockquote>
+<p>Modifying an agreement requires a full PUT, which means even if you change one value, you still need to submit the entire body.</p>
+</blockquote>
 <pre class="highlight http"><code><span class="nf">PUT</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
 <span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
-</code></pre>
+
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123456"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"terms"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"dates"</span><span class="p">:{</span><span class="w">
+       </span><span class="nt">"start_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YYYY-MM-dd 12:34:56Z"</span><span class="p">,</span><span class="w">
+       </span><span class="nt">"end_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YYYY-MM-dd 12:34:56Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"terms of the agreement go here"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"renter"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
+    </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"buzz"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bazz"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234567890"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"renter@gmail.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"address"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Austin"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TX"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78704"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123 4th Street"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Apt. 456"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}],</span><span class="w">
+  </span><span class="nt">"landlord"</span><span class="p">:[{</span><span class="w">
+    </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"foo"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bar"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234567890"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"landlord@gmail.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"address"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Austin"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TX"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78704"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123 4th Street"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"address_line2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Apt. 456"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
 </code></pre>
 
 <p>Modifying an agreement requires a <em>full PUT</em>, meaning the entire agreement must be re-submitted if any part changes.</p>
-
-<h3 id="response-reference">Response Reference</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>agreement_id</td>
-<td>GUID</td>
-<td>Globally unique identifier of the agreement.  Not editable.</td>
-</tr>
-<tr>
-<td>status</td>
-<td>String</td>
-<td>The current status of the agreement.  Values include: </br></br><code class="prettyprint">active</code> - The default staus of a new agreement</br></br><code class="prettyprint">completed</code> - Used when a an agreement terms are satisfied and disbursement is complete</br></br><code class="prettyprint">cancelled</code> - Used when an agreement is no longer valid.</td>
-</tr>
-</tbody></table>
 
 <h2 id="cancel-agreement">Cancel Agreement</h2>
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/cancel</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
@@ -478,10 +509,13 @@ grant_type=client_credentials
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
 <span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
 
-<span class="p">{}</span><span class="w">
+<span class="p">{</span><span class="w">
+  </span><span class="nt">"notes"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agreement end"</span><span class="w">
+</span><span class="p">}</span><span class="w">
 </span></code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
 <span class="na">Location</span><span class="p">:</span>  <span class="s">http://api.depositguard.com/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/complete</span>
+
 </code></pre>
 
 <p>Completes the agreement.  Use this when the agreement terms are fulfilled and all parties are satisfied.</p>
@@ -518,7 +552,7 @@ grant_type=client_credentials
 
 <p>Add an additional note to the agreement.</p>
 
-<h3 id="request-reference">Request Reference</h3>
+request-reference&rdquo;>Request Reference</h3>
 
 <table><thead>
 <tr>
@@ -539,6 +573,7 @@ grant_type=client_credentials
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
 <span class="na">Host</span><span class="p">:</span> <span class="s">api.depositguard.com</span>
+
 </code></pre>
 <pre class="highlight http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
@@ -560,12 +595,12 @@ grant_type=client_credentials
       </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-23T13:15:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"charge"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"payment"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"charge"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"payment"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="w">
     </span><span class="p">},</span><span class="w">
@@ -574,7 +609,7 @@ grant_type=client_credentials
       </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"disbursement"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"payout"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"full disbursement"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"date_created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-20T13:15:30Z"</span><span class="w">
     </span><span class="p">}</span><span class="w">
@@ -601,7 +636,7 @@ grant_type=client_credentials
 <tr>
 <td>type</td>
 <td>String</td>
-<td>Kind of event.  Values include: <code class="prettyprint">agreement_created</code>, <code class="prettyprint">agreement_modified</code>, <code class="prettyprint">agreement_complete</code>, <code class="prettyprint">agreement_cancelled</code>, <code class="prettyprint">deposit</code>, <code class="prettyprint">disburse</code>, and <code class="prettyprint">note</code></td>
+<td>Kind of event.  Values include: <code class="prettyprint">agreement_created</code>, <code class="prettyprint">agreement_modified</code>, <code class="prettyprint">agreement_complete</code>, <code class="prettyprint">agreement_cancelled</code>, <code class="prettyprint">payment</code>, <code class="prettyprint">payout</code>, and <code class="prettyprint">note</code></td>
 </tr>
 <tr>
 <td>note</td>
@@ -676,8 +711,7 @@ grant_type=client_credentials
 
 <p>The renter needs to provide payment information to fund the account and eventually pay the landlord.  To do this, capture the information in a typical web form and submit the data directly to DepositGuard.  This is known in the industry as a direct post method (DPM).</p>
 
-<h3 id="direct-post-method-flow">Direct Post Method Flow</h3>
-
+<h3 id="direct-post-method-flow">Direct Post Method Flow
 <ol>
 <li> Post (via form) the user&rsquo;s credit card info, form key, and redirect url directly to DepositGuard.</li>
 <li> DepositGuard confirms the credit card and returns the user and a credit card <em>nonce</em> to the redirect url provided.</li>
@@ -695,7 +729,7 @@ Payments can only be made with a credit card.</br>
 Unlike the payment itself, payment methods are not explicitly associated with a user or with an agreement.
 </aside>
 
-payment&rdquo;>Payment</h2>
+<h2 id="payment">Payment</h2>
 <pre class="highlight http"><code><span class="nf">POST</span> <span class="nn">/agreements/d646e985-b895-4fb6-b121-b221e5daa9db/deposits</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 <span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer &lt;Access-Token&gt;</span>
@@ -707,6 +741,7 @@ payment&rdquo;>Payment</h2>
     </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123.45"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USD"</span><span class="w">
   </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"security_deposit"</span><span class="p">,</span><span class="w">
   </span><span class="nt">"note"</span><span class="p">:</span><span class="w"> </span><span class="s2">"half of deposit"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
@@ -716,7 +751,47 @@ payment&rdquo;>Payment</h2>
 
 <p>Authorizes and immediately charges a payment for the specified amount.  The value is held by DepositGuard until a payout is disbursed.</p>
 
-<h1 id="payouts">Payouts</h1>
+<h3 id="request-reference">Request Reference</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>payment_method_nonce</td>
+<td>GUID</td>
+<td></td>
+</tr>
+<tr>
+<td>total</td>
+<td>string</td>
+<td>Amount to process.</td>
+</tr>
+<tr>
+<td>currency</td>
+<td>string</td>
+<td>Currency to process the total as.</td>
+</tr>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Kind of payment.  Values include: <code class="prettyprint">rental</code> &amp; <code class="prettyprint">security_deposit</code></td>
+</tr>
+<tr>
+<td>note</td>
+<td>String</td>
+<td>Adds a description for the payment.</td>
+</tr>
+</tbody></table>
+
+<aside class="success">
+Remember that the renter will receive their security deposit back on the card(s) used at the time that agreement is completed.
+</aside>
+
+payouts&quot;>Payouts</h1>
 
 <h2 id="capture-payout-method">Capture Payout Method</h2>
 <pre class="highlight html"><code><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"http://api.depositguard.net/payoutmethods"</span> 
@@ -746,7 +821,7 @@ payment&rdquo;>Payment</h2>
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>The landlord needs to provide their bank account information so that DepositGuard can disburse the payout.  Functions the same as above, but has a different form action, fields, and redirect url.</p>
+<p>The landlord needs to provide their bank account information so that DepositGuard can disburse the payout.  This is also a direct post that functions the same as above, but has a different form action, fields, and redirect url.</p>
 
 <aside class="notice">
 Disbursements can only be made via ACH transfer to a bank account.
